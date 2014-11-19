@@ -1,11 +1,11 @@
 var pieceData = {
-  'a': [1],
-  'b': [1, 1],
+  'a': [[1]],
+  'b': [[1, 1]],
   'c': [
     [1, 1],
     [0, 1]
   ],
-  'd': [1, 1, 1],
+  'd': [[1, 1, 1]],
   'e': [
     [1, 1],
     [1, 1]
@@ -277,32 +277,62 @@ function print(){
   elm.innerHTML = html;
 }
 
-function matrixRotate(arr){
-  var dist = new Array(arr.length);
-  if(arr[0].length){
-    if(arr[0].length>1){
-      for(var i=0; i<arr[0].length; i++){
-        dist[i] = new Array(arr[0].length)
-      }
-      for(var v=0; v<dist.length; v++){
-        for(var h=0; h<dist[0].length; h++){
-          dist[v][h] = arr[dist[0].length-1-h][v]
-        }
-      }
-    }else{
-      for(var i=0; i<dist.length; i++){
-        dist[i] = arr[i][0]
-      }
-    }
-  }else{
-    for(var i=0; i<dist.length; i++){
-      dist[i] = [arr[i]]
+function matrixRotate(matrix, degree){
+  switch (degree){
+    case 90:
+      matrix = transpose(matrix);
+      matrix = reversal(matrix);
+      break;
+    case -90:
+      matrix = transpose(matrix);
+      matrix = reversal(matrix, 'v');
+      break;
+  }
+  return matrix;
+}
+
+
+//matrixRotate([1,2,3,4])
+
+//矩阵旋转：顺时针先转置再水平翻转，逆时针先转置再垂直翻转
+
+//转置
+function transpose(matrix){
+  var col = matrix[0].length||1, row = matrix.length;
+  var newMatrix = new Array(col);
+  for(var i =0; i<col; i++){
+    newMatrix[i] = new Array(row)
+  }
+  for(var v=0; v<matrix.length; v++){
+    for(var h=0; h<matrix[0].length; h++){
+      newMatrix[h][v] = matrix[v][h]
     }
   }
-  console.log(dist)
-  return dist;
+  return newMatrix;
 }
-//matrixRotate([1,2,3,4])
+//翻转
+function reversal(matrix, dir){ //dir v垂直 h水平
+  var direction = dir||'h';
+  if(direction==='h'){
+    for(var i=0; i<matrix.length; i++){
+      var temp, len = matrix[0].length;
+      for(var j=0; j<Math.floor(len/2); j++){
+        temp = matrix[i][len-1-j];
+        matrix[i][len-1-j] = matrix[i][j];
+        matrix[i][j] = temp;
+      }
+    }
+  }
+  if(direction==='v'){
+    var temp, len = matrix.length;
+    for(var j=0; j<Math.floor(len/2); j++){
+      temp = matrix[len-1-j];
+      matrix[len-1-j] = matrix[j];
+      matrix[j] = temp;
+    }
+  }
+  return matrix;
+}
 
 init()
 
