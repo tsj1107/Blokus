@@ -277,6 +277,7 @@ function print(){
   elm.innerHTML = html;
 }
 
+//矩阵旋转：顺时针先转置再水平翻转，逆时针先转置再垂直翻转
 function matrixRotate(matrix, degree){
   switch (degree){
     case 90:
@@ -290,11 +291,6 @@ function matrixRotate(matrix, degree){
   }
   return matrix;
 }
-
-
-//matrixRotate([1,2,3,4])
-
-//矩阵旋转：顺时针先转置再水平翻转，逆时针先转置再垂直翻转
 
 //转置
 function transpose(matrix){
