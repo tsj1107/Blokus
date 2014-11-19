@@ -277,6 +277,33 @@ function print(){
   elm.innerHTML = html;
 }
 
+function matrixRotate(arr){
+  var dist = new Array(arr.length);
+  if(arr[0].length){
+    if(arr[0].length>1){
+      for(var i=0; i<arr[0].length; i++){
+        dist[i] = new Array(arr[0].length)
+      }
+      for(var v=0; v<dist.length; v++){
+        for(var h=0; h<dist[0].length; h++){
+          dist[v][h] = arr[dist[0].length-1-h][v]
+        }
+      }
+    }else{
+      for(var i=0; i<dist.length; i++){
+        dist[i] = arr[i][0]
+      }
+    }
+  }else{
+    for(var i=0; i<dist.length; i++){
+      dist[i] = [arr[i]]
+    }
+  }
+  console.log(dist)
+  return dist;
+}
+//matrixRotate([1,2,3,4])
+
 init()
 
 
