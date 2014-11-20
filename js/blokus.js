@@ -39,11 +39,19 @@ var stage = new Kinetic.Stage({
 
 var num = 0;
 function piece(id, item) {
+  var groupSize = {
+    w: item[0].length ? (item[0].length * BLOKUS.pixSize) : BLOKUS.pixSize,
+    h: item.length * BLOKUS.pixSize
+  }
   var group = new Kinetic.Group({
     x: num * 100,
     y: 0,
-    width: item.length * BLOKUS.pixSize,
-    height: item[0].length ? (item[0].length * BLOKUS.pixSize) : BLOKUS.pixSize,
+    width: groupSize.w,
+    height: groupSize.h,
+    offset: {
+      x: groupSize.w/2,
+      y: groupSize.h/2
+    },
     draggable: true
   });
 
@@ -81,6 +89,10 @@ function piece(id, item) {
   this.metrix = item;
   this.shape = group;
   this.color = 1;
+  this.offset = {
+    x: groupSize.w/2,
+    y: groupSize.h/2
+  };
   num++;
 }
 
@@ -146,8 +158,8 @@ function init() {
         this.moveToTop();
         pieceLayer.draw();
         var gridPos = {
-          x: Math.round(shape.getX() / BLOKUS.pixSize),
-          y: Math.round(shape.getY() / BLOKUS.pixSize)
+          x: Math.round((shape.getX()-obj.offset.x) / BLOKUS.pixSize),
+          y: Math.round((shape.getY()-obj.offset.y) / BLOKUS.pixSize)
         }
         if(shape.isStick){
           revokeFlag(obj, gridPos);
@@ -162,13 +174,13 @@ function init() {
       shape.on('dragend', function () {
         shape.isStick = false;
         var gridPos = {
-          x: Math.round(shape.getX() / BLOKUS.pixSize),
-          y: Math.round(shape.getY() / BLOKUS.pixSize)
+          x: Math.round((shape.getX()-obj.offset.x) / BLOKUS.pixSize),
+          y: Math.round((shape.getY()-obj.offset.y) / BLOKUS.pixSize)
         }
         if(isValidate(obj.metrix, gridPos)){
           var pos = {
-            x: gridPos.x * BLOKUS.pixSize,
-            y: gridPos.y * BLOKUS.pixSize
+            x: gridPos.x * BLOKUS.pixSize+obj.offset.x,
+            y: gridPos.y * BLOKUS.pixSize+obj.offset.y
           };
           shape.setPosition(pos);
           shape.isStick = true;
@@ -191,6 +203,11 @@ function init() {
         document.body.style.cursor = 'default';
       })
 
+      shape.on('click', function(){
+        shape.rotate(90)
+        pieceLayer.draw();
+      })
+
       pieceLayer.add(shape)
 
     })()
@@ -201,20 +218,12 @@ function init() {
 }
 
 function isValidate(metrix, gridPos){
-  if(typeof metrix[0] === 'number'){
-    for(var i=0; i<metrix.length; i++){
-      if(metrix[i]&&boardMatrix[gridPos.x+i][gridPos.y]){
+  var tempArr;
+  for(var i=0; i<metrix.length; i++){
+    tempArr = metrix[i];
+    for(var j=0; j<tempArr.length; j++){
+      if((gridPos.x+j)>=BLOKUS.boardSize||(gridPos.y+i)>=BLOKUS.boardSize||(metrix[i][j]&&boardMatrix[gridPos.x+j][gridPos.y+i])){
         return false;
-      }
-    }
-  }else{
-    var tempArr;
-    for(var i=0; i<metrix.length; i++){
-      tempArr = metrix[i];
-      for(var j=0; j<tempArr.length; j++){
-        if(metrix[i][j]&&boardMatrix[gridPos.x+j][gridPos.y+i]){
-          return false;
-        }
       }
     }
   }
@@ -223,20 +232,12 @@ function isValidate(metrix, gridPos){
 
 function revokeFlag(piece, gridPos){
   var metrix = piece.metrix;
-  if(typeof metrix[0] === 'number'){
-    for(var i=0; i<metrix.length; i++){
-      if(metrix[i]){
-        boardMatrix[gridPos.x+i][gridPos.y] = 0;
-      }
-    }
-  }else{
-    var tempArr;
-    for(var i=0; i<metrix.length; i++){
-      tempArr = metrix[i];
-      for(var j=0; j<tempArr.length; j++){
-        if(metrix[i][j]){
-          boardMatrix[gridPos.x+j][gridPos.y+i] = 0;
-        }
+  var tempArr;
+  for(var i=0; i<metrix.length; i++){
+    tempArr = metrix[i];
+    for(var j=0; j<tempArr.length; j++){
+      if(metrix[i][j]){
+        boardMatrix[gridPos.x+j][gridPos.y+i] = 0;
       }
     }
   }
@@ -245,20 +246,12 @@ function revokeFlag(piece, gridPos){
 
 function markFlag(piece, gridPos){
   var metrix = piece.metrix;
-  if(typeof metrix[0] === 'number'){
-    for(var i=0; i<metrix.length; i++){
-      if(metrix[i]) {
-        boardMatrix[gridPos.x + i][gridPos.y] = piece.color;
-      }
-    }
-  }else{
-    var tempArr;
-    for(var i=0; i<metrix.length; i++){
-      tempArr = metrix[i];
-      for(var j=0; j<tempArr.length; j++){
-        if(metrix[i][j]){
-          boardMatrix[gridPos.x+j][gridPos.y+i] = piece.color;
-        }
+  var tempArr;
+  for(var i=0; i<metrix.length; i++){
+    tempArr = metrix[i];
+    for(var j=0; j<tempArr.length; j++){
+      if(metrix[i][j]){
+        boardMatrix[gridPos.x+j][gridPos.y+i] = piece.color;
       }
     }
   }
