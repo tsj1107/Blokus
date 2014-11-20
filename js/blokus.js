@@ -204,7 +204,17 @@ function init() {
       })
 
       shape.on('click', function(){
-        shape.rotate(90)
+        var gridPos = {
+          x: Math.round((shape.getX()-obj.offset.x) / BLOKUS.pixSize),
+          y: Math.round((shape.getY()-obj.offset.y) / BLOKUS.pixSize)
+        }
+        if(shape.isStick){
+          revokeFlag(obj, gridPos);
+          shape.isStick = false;
+        }
+        shape.rotate(90);
+        matrixRotate(obj.metrix);
+
         pieceLayer.draw();
       })
 
@@ -272,6 +282,7 @@ function print(){
 
 //矩阵旋转：顺时针先转置再水平翻转，逆时针先转置再垂直翻转
 function matrixRotate(matrix, degree){
+  degree = degree||90;
   switch (degree){
     case 90:
       matrix = transpose(matrix);
