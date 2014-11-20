@@ -38,8 +38,8 @@ var stage = new Kinetic.Stage({
 });
 
 var num = 0;
-function piece(id, item) {
-  var groupSize = {
+function Piece(id, item) {
+  var groupSize = this.size = {
     w: item[0].length ? (item[0].length * BLOKUS.pixSize) : BLOKUS.pixSize,
     h: item.length * BLOKUS.pixSize
   }
@@ -56,25 +56,11 @@ function piece(id, item) {
   });
 
   for (var i = 0; i < item.length; i++) {//纵向
-    if (item[0].length) {
-      for (var j = 0; j < item[0].length; j++) {//横向
-        if (item[i][j] != 0) {
-          group.add(new Kinetic.Rect({
-            x: BLOKUS.pixSize * j,
-            y: BLOKUS.pixSize * i,
-            width: BLOKUS.pixSize,
-            height: BLOKUS.pixSize,
-            fill: '#00D2FF',
-            stroke: 'black',
-            strokeWidth: 1
-          }))
-        }
-      }
-    } else {
-      if (item[i] != 0) {
+    for (var j = 0; j < item[0].length; j++) {//横向
+      if (item[i][j] != 0) {
         group.add(new Kinetic.Rect({
-          x: BLOKUS.pixSize * i,
-          y: 0,
+          x: BLOKUS.pixSize * j,
+          y: BLOKUS.pixSize * i,
           width: BLOKUS.pixSize,
           height: BLOKUS.pixSize,
           fill: '#00D2FF',
@@ -94,6 +80,21 @@ function piece(id, item) {
     y: groupSize.h/2
   };
   num++;
+}
+Piece.prototype.rotate = function(degree){
+  this.metrix = matrixRotate(this.metrix);
+  var size = {
+    w: this.size.w,
+    h: this.size.h
+  };
+  this.size = {
+    h: size.w,
+    w: size.h
+  };
+  this.offset = {
+    x: size.h/2,
+    y: size.w/2
+  }
 }
 
 function board() {
@@ -144,7 +145,7 @@ function init() {
   boardLayer.add(board());
   for (item in pieceData) {
     (function () {
-      var obj = new piece(item, pieceData[item]),
+      var obj = new Piece(item, pieceData[item]),
         shape = obj.shape;
 
 //  TODO group cache 报错
@@ -213,7 +214,7 @@ function init() {
           shape.isStick = false;
         }
         shape.rotate(90);
-        matrixRotate(obj.metrix);
+        obj.rotate(90);
 
         pieceLayer.draw();
       })
@@ -232,7 +233,8 @@ function isValidate(metrix, gridPos){
   for(var i=0; i<metrix.length; i++){
     tempArr = metrix[i];
     for(var j=0; j<tempArr.length; j++){
-      if((gridPos.x+j)>=BLOKUS.boardSize||(gridPos.y+i)>=BLOKUS.boardSize||(metrix[i][j]&&boardMatrix[gridPos.x+j][gridPos.y+i])){
+      if((gridPos.x+j)>=BLOKUS.boardSize||(gridPos.y+i)>=BLOKUS.boardSize||
+        (metrix[i][j]&&boardMatrix[gridPos.x+j][gridPos.y+i])){
         return false;
       }
     }
