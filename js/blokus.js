@@ -100,7 +100,7 @@ Piece.prototype.rotate = function(degree){
 }
 
 function findBorder(metrix){
-  var N = metrix.length, M = metrix[0].length, arr;
+  var N = metrix.length, M = metrix[0].length, arr = [];
   for(var i=0; i<N; i++){
     if(metrix[i][M-1]){
       arr.push([i, M])
@@ -114,10 +114,10 @@ function findBorder(metrix){
     }
   }
   for(var j=0; j<M; j++){
-    if(metrix[M-1][j]){
-      arr.push([M, j])
+    if(metrix[N-1][j]){
+      arr.push([N, j])
     }else{
-      arr.push([M-1, j])
+      arr.push([N-1, j])
     }
     if(metrix[0][j]){
       arr.push([-1, j])
@@ -128,9 +128,6 @@ function findBorder(metrix){
   return arr
 }
 
-function inArray(){
-
-}
 function board() {
   var group = new Kinetic.Group({
     x: 0,
@@ -264,7 +261,7 @@ function init() {
 
 function isValidate(piece, gridPos){
   var tempArr;
-  var metrix = piece.metrix;
+  var metrix = piece.metrix, border = piece.border;
   for(var i=0; i<metrix.length; i++){
     tempArr = metrix[i];
     for(var j=0; j<tempArr.length; j++){
@@ -272,6 +269,13 @@ function isValidate(piece, gridPos){
         (metrix[i][j]&&boardMatrix[gridPos.x+j][gridPos.y+i])){
         return false;
       }
+    }
+  }
+  for(var j=0; j<border.length; j++){
+    if((gridPos.x+border[j][1]>=boardMatrix.length)||(gridPos.y+border[j][0]>=boardMatrix[0].length))continue;
+    var cell = boardMatrix[gridPos.x+border[j][1]][gridPos.y+border[j][0]]
+    if(cell===piece.color){
+      return false;
     }
   }
   return true;
