@@ -73,6 +73,7 @@ function Piece(id, item) {
 
   this.id = id;
   this.metrix = item;
+  this.border = findBorder(item);
   this.shape = group;
   this.color = 1;
   this.offset = {
@@ -82,7 +83,8 @@ function Piece(id, item) {
   num++;
 }
 Piece.prototype.rotate = function(degree){
-  this.metrix = matrixRotate(this.metrix);
+  this.metrix = matrixRotate(this.metrix, degree);
+  this.border = findBorder(this.metrix);
   var size = {
     w: this.size.w,
     h: this.size.h
@@ -97,6 +99,38 @@ Piece.prototype.rotate = function(degree){
   }
 }
 
+function findBorder(metrix){
+  var N = metrix.length, M = metrix[0].length, arr;
+  for(var i=0; i<N; i++){
+    if(metrix[i][M-1]){
+      arr.push([i, M])
+    }else{
+      arr.push([i, M-1])
+    }
+    if(metrix[i][0]){
+      arr.push([i, -1])
+    }else{
+      arr.push([i, 0])
+    }
+  }
+  for(var j=0; j<M; j++){
+    if(metrix[M-1][j]){
+      arr.push([M, j])
+    }else{
+      arr.push([M-1, j])
+    }
+    if(metrix[0][j]){
+      arr.push([-1, j])
+    }else{
+      arr.push([0, j])
+    }
+  }
+  return arr
+}
+
+function inArray(){
+
+}
 function board() {
   var group = new Kinetic.Group({
     x: 0,
@@ -178,7 +212,7 @@ function init() {
           x: Math.round((shape.getX()-obj.offset.x) / BLOKUS.pixSize),
           y: Math.round((shape.getY()-obj.offset.y) / BLOKUS.pixSize)
         }
-        if(isValidate(obj.metrix, gridPos)){
+        if(isValidate(obj, gridPos)){
           var pos = {
             x: gridPos.x * BLOKUS.pixSize+obj.offset.x,
             y: gridPos.y * BLOKUS.pixSize+obj.offset.y
@@ -228,8 +262,9 @@ function init() {
   stage.add(pieceLayer);
 }
 
-function isValidate(metrix, gridPos){
+function isValidate(piece, gridPos){
   var tempArr;
+  var metrix = piece.metrix;
   for(var i=0; i<metrix.length; i++){
     tempArr = metrix[i];
     for(var j=0; j<tempArr.length; j++){
